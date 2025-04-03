@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+using System;
 using System.Collections;
 
 using UnityEngine;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.XR.ARFoundation;
+using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 /**
  * Spawns a <see cref="CarBehaviour"/> when a plane is tapped.
@@ -29,6 +32,16 @@ public class CarManager : MonoBehaviour
     public DrivingSurfaceManager DrivingSurfaceManager;
 
     public CarBehaviour Car;
+
+    protected void OnEnable()
+    {
+        EnhancedTouchSupport.Enable();
+    }
+
+    protected void OnDisable()
+    {
+        EnhancedTouchSupport.Disable();
+    }
 
     private void Update()
     {
@@ -45,22 +58,9 @@ public class CarManager : MonoBehaviour
 
     private bool WasTapped()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            return true;
-        }
-
-        if (Input.touchCount == 0)
-        {
-            return false;
-        }
-
-        var touch = Input.GetTouch(0);
-        if (touch.phase != TouchPhase.Began)
-        {
-            return false;
-        }
-
+        var activeTouches = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches;
+        if (activeTouches.Count < 1 || activeTouches[0].phase != TouchPhase.Began) { return false; }
+        
         return true;
     }
 }
